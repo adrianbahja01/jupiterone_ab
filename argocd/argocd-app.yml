@@ -1,0 +1,32 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: jupiterone-deployment2
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "2"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/adrianbahja01/jupiterone_ab.git
+    targetRevision: 0.9.5
+    path: helm/jupiterone
+    helm:
+      parameters:
+      - name: secrets.jupiteroneAccountId
+        value: "ACCOUNT_ID"
+      - name: secrets.jupiteroneApiKey
+        value: "API_KEY"
+      - name: secrets.jupiteroneIntegrationInstanceId
+        value: "INSTANCE_ID"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: jupiterone2
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true
